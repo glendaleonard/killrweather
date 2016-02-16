@@ -47,12 +47,17 @@ final class ApiNodeGuardian extends ClusterAwareNodeGuardian with ClientHelper {
 
   var task: Option[Cancellable] = None
 
+  cluster.joinSeedNodes(Vector(cluster.selfAddress))
+
+    
  /* override def preStart(): Unit = {
     super.preStart()
     cluster.join(base)
     cluster.joinSeedNodes(Vector(base))
   }
 */
+  //Using ! on an ActorRef means to send it an message.
+  //It’s the most common way in Akka for interacting with other actors. 
   Cluster(context.system).registerOnMemberUp {
     task = Some(context.system.scheduler.schedule(Duration.Zero, 2.seconds) {
       api ! Event.QueryTask
@@ -88,6 +93,7 @@ private[killrweather] class AutomatedApiActor extends Actor with ActorLogging wi
     case e: WeatherModel =>
       log.debug("Received {} from {}", e, sender)
     case Event.QueryTask => queries()
+    case _  => log.info("received unknown message")
   }
 
   def queries(): Unit = {
