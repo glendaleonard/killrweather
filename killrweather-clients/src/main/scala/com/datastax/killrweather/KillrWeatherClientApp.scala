@@ -47,6 +47,15 @@ final class ApiNodeGuardian extends ClusterAwareNodeGuardian with ClientHelper {
 
   var task: Option[Cancellable] = None
 
+  /*
+   * When using joinSeedNodes you should not include the node 
+   * itself except for the node that is supposed to be the 
+   * first seed node, and that should be placed first in 
+   * parameter to joinSeedNodes.
+   * 
+   * We haven't defined seed nodes in reference.conf so we add 
+   * self to the seed nodes here
+   */
   cluster.joinSeedNodes(Vector(cluster.selfAddress))
 
     
